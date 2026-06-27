@@ -30,37 +30,37 @@ Action checklist for implementing the MVP. Product scope, limitations, and guard
 
 ## Phase 1 — Load local state and render the profile UI
 
-- [ ] Create `src/routes/+page.server.ts`.
-- [ ] Load the demo profile ID from the in-memory store in `src/routes/+page.server.ts`.
-- [ ] Load connected accounts from the in-memory store in `src/routes/+page.server.ts`.
-- [ ] Load timeline updates from the in-memory store in `src/routes/+page.server.ts`.
-- [ ] Derive connector statuses for X, Telegram Login, and Telegram Bot in `src/routes/+page.server.ts`.
-- [ ] Replace the default SvelteKit content in `src/routes/+page.svelte` with the Weavr MVP profile page.
-- [ ] Render the demo profile header in `src/routes/+page.svelte`.
-- [ ] Render the X connector action row in `src/routes/+page.svelte`.
-- [ ] Render the Telegram Login connector action row in `src/routes/+page.svelte`.
-- [ ] Render the Telegram Bot setup/action row in `src/routes/+page.svelte`.
-- [ ] Render Instagram as static limitation copy, not a connector action.
-- [ ] Render WhatsApp as static limitation copy, not a connector action.
-- [ ] Render the exact X copy: “Import your own public X posts where your API access allows it.”
-- [ ] Render the exact Telegram Login copy: “Use Telegram to identify your Weavr account.”
-- [ ] Render the exact Telegram Bot copy: “Send or forward messages to the Weavr bot to add them to your profile.”
-- [ ] Render the Telegram Channel setup copy: “Channel import requires adding the bot to a channel with permission to receive posts.”
-- [ ] Render the Instagram limitation copy: “Instagram media import is not part of this MVP because it requires additional Meta account setup and review.”
-- [ ] Render the WhatsApp limitation copy: “Weavr cannot read WhatsApp Status.”
-- [ ] Create `src/lib/components/ConnectorPanel.svelte`.
-- [ ] Move connector-row rendering into `src/lib/components/ConnectorPanel.svelte`.
-- [ ] Create `src/lib/components/Timeline.svelte`.
-- [ ] Move reverse-chronological timeline rendering by `occurredAt` into `src/lib/components/Timeline.svelte`.
-- [ ] Create `src/lib/components/UpdateCard.svelte`.
-- [ ] Move per-update source labels and update content rendering into `src/lib/components/UpdateCard.svelte`.
-- [ ] Render the “No connected sources yet.” empty state when no accounts exist.
-- [ ] Render the “Connected, waiting for updates.” empty state when accounts exist but no updates exist.
-- [ ] Verify the profile page renders without X or Telegram credentials configured.
-- [ ] Verify X and Telegram are the only connector actions.
-- [ ] Verify Instagram and WhatsApp appear only as static limitations.
-- [ ] Run `pnpm run check`.
-- [ ] Run `pnpm run lint`.
+- [x] Create `src/routes/+page.server.ts`.
+- [x] Load the demo profile ID from the in-memory store in `src/routes/+page.server.ts`.
+- [x] Load connected accounts from the in-memory store in `src/routes/+page.server.ts`.
+- [x] Load timeline updates from the in-memory store in `src/routes/+page.server.ts`.
+- [x] Derive connector statuses for X, Telegram Login, and Telegram Bot in `src/routes/+page.server.ts`.
+- [x] Replace the default SvelteKit content in `src/routes/+page.svelte` with the Weavr MVP profile page.
+- [x] Render the demo profile header in `src/routes/+page.svelte`.
+- [x] Render the X connector action row in `src/routes/+page.svelte`.
+- [x] Render the Telegram Login connector action row in `src/routes/+page.svelte`.
+- [x] Render the Telegram Bot setup/action row in `src/routes/+page.svelte`.
+- [x] Render Instagram as static limitation copy, not a connector action.
+- [x] Render WhatsApp as static limitation copy, not a connector action.
+- [x] Render the exact X copy: “Import your own public X posts where your API access allows it.”
+- [x] Render the exact Telegram Login copy: “Use Telegram to identify your Weavr account.”
+- [x] Render the exact Telegram Bot copy: “Send or forward messages to the Weavr bot to add them to your profile.”
+- [x] Render the Telegram Channel setup copy: “Channel import requires adding the bot to a channel with permission to receive posts.”
+- [x] Render the Instagram limitation copy: “Instagram media import is not part of this MVP because it requires additional Meta account setup and review.”
+- [x] Render the WhatsApp limitation copy: “Weavr cannot read WhatsApp Status.”
+- [x] Create `src/lib/components/ConnectorPanel.svelte`.
+- [x] Move connector-row rendering into `src/lib/components/ConnectorPanel.svelte`.
+- [x] Create `src/lib/components/Timeline.svelte`.
+- [x] Move reverse-chronological timeline rendering by `occurredAt` into `src/lib/components/Timeline.svelte`.
+- [x] Create `src/lib/components/UpdateCard.svelte`.
+- [x] Move per-update source labels and update content rendering into `src/lib/components/UpdateCard.svelte`.
+- [x] Render the “No connected sources yet.” empty state when no accounts exist.
+- [x] Render the “Connected, waiting for updates.” empty state when accounts exist but no updates exist.
+- [x] Verify the profile page renders without X or Telegram credentials configured.
+- [x] Verify X and Telegram are the only connector actions.
+- [x] Verify Instagram and WhatsApp appear only as static limitations.
+- [x] Run `pnpm run check`.
+- [x] Run `pnpm run lint`.
 
 ## Phase 2 — Prepare provider callback testing
 
