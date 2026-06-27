@@ -2,29 +2,31 @@
 
 Action checklist for implementing the MVP. Product scope, limitations, and guardrails are in `OUTLINE.md`.
 
+> **End-of-phase verification (every phase):** run `pnpm run check`, `pnpm run lint`, then build + temporarily deploy with `pnpm run deploy:temporary` and curl the deployed URL to verify the app works as expected. Fix anything broken before moving on. Note: a freshly deployed temporary worker may need ~30s before its TLS cert responds.
+
 ## Phase 0 — Confirm baseline and create MVP primitives
 
-- [ ] Inspect `package.json`, `vite.config.ts`, `wrangler.jsonc`, `src/routes/+page.svelte`, and `src/routes/+layout.svelte` before implementation.
-- [ ] Create `src/lib/types.ts`.
-- [ ] Define `Provider` as `'x' | 'telegram'` in `src/lib/types.ts`.
-- [ ] Define `ConnectedAccount` in `src/lib/types.ts` with `id`, `provider`, `providerUserId`, optional `username`, optional `displayName`, optional `avatarUrl`, `status: 'connected' | 'blocked' | 'rate_limited' | 'needs_reconnect' | 'error'`, and `scopes`.
-- [ ] Define `Update` in `src/lib/types.ts` with `id`, `provider`, `sourceKind: 'oauth_fetch' | 'bot_message' | 'forwarded_message' | 'channel_post'`, optional `externalId`, optional `authorName`, optional `authorUsername`, optional `text`, optional `externalUrl`, `occurredAt`, `ingestedAt`, and optional `rawPayload`.
-- [ ] Define `ConnectorStatus` in `src/lib/types.ts` with `idle`, `connected`, `blocked`, `rate_limited`, `needs_reconnect`, `setup_required`, and `error`.
-- [ ] Define `XTokenMetadata` in `src/lib/types.ts` with `accessToken`, optional `refreshToken`, optional `expiresAt`, and `scopes`.
-- [ ] Create `src/lib/server/store.ts`.
-- [ ] Export fixed demo profile ID `demo-profile` from `src/lib/server/store.ts`.
-- [ ] Add in-memory connected-account storage to `src/lib/server/store.ts`.
-- [ ] Add in-memory update storage to `src/lib/server/store.ts`.
-- [ ] Add in-memory OAuth state storage to `src/lib/server/store.ts`.
-- [ ] Add in-memory Telegram `update_id` dedupe storage to `src/lib/server/store.ts`.
-- [ ] Add in-memory connector notice storage to `src/lib/server/store.ts` for setup-required messages.
-- [ ] Export store functions for listing accounts, upserting accounts, listing updates, adding updates, creating OAuth states, consuming OAuth states, checking Telegram update IDs, recording Telegram update IDs, setting connector notices, and reading connector notices.
-- [ ] Create `src/lib/server/config.ts`.
-- [ ] Add `getRequiredServerEnv(name: string): string` to `src/lib/server/config.ts`.
-- [ ] Make `getRequiredServerEnv` throw `Missing required environment variable: ${name}` when the requested value is absent.
-- [ ] Add `.env.example` with placeholders for `APP_URL`, `X_CLIENT_ID`, `X_CLIENT_SECRET`, `X_REDIRECT_URI`, `TELEGRAM_OIDC_CLIENT_ID`, `TELEGRAM_OIDC_CLIENT_SECRET`, `TELEGRAM_OIDC_REDIRECT_URI`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET_TOKEN`, and optional `TELEGRAM_DEMO_CHANNEL_ID`.
-- [ ] Run `pnpm run check`.
-- [ ] Run `pnpm run lint`.
+- [x] Inspect `package.json`, `vite.config.ts`, `wrangler.jsonc`, `src/routes/+page.svelte`, and `src/routes/+layout.svelte` before implementation.
+- [x] Create `src/lib/types.ts`.
+- [x] Define `Provider` as `'x' | 'telegram'` in `src/lib/types.ts`.
+- [x] Define `ConnectedAccount` in `src/lib/types.ts` with `id`, `provider`, `providerUserId`, optional `username`, optional `displayName`, optional `avatarUrl`, `status: 'connected' | 'blocked' | 'rate_limited' | 'needs_reconnect' | 'error'`, and `scopes`.
+- [x] Define `Update` in `src/lib/types.ts` with `id`, `provider`, `sourceKind: 'oauth_fetch' | 'bot_message' | 'forwarded_message' | 'channel_post'`, optional `externalId`, optional `authorName`, optional `authorUsername`, optional `text`, optional `externalUrl`, `occurredAt`, `ingestedAt`, and optional `rawPayload`.
+- [x] Define `ConnectorStatus` in `src/lib/types.ts` with `idle`, `connected`, `blocked`, `rate_limited`, `needs_reconnect`, `setup_required`, and `error`.
+- [x] Define `XTokenMetadata` in `src/lib/types.ts` with `accessToken`, optional `refreshToken`, optional `expiresAt`, and `scopes`.
+- [x] Create `src/lib/server/store.ts`.
+- [x] Export fixed demo profile ID `demo-profile` from `src/lib/server/store.ts`.
+- [x] Add in-memory connected-account storage to `src/lib/server/store.ts`.
+- [x] Add in-memory update storage to `src/lib/server/store.ts`.
+- [x] Add in-memory OAuth state storage to `src/lib/server/store.ts`.
+- [x] Add in-memory Telegram `update_id` dedupe storage to `src/lib/server/store.ts`.
+- [x] Add in-memory connector notice storage to `src/lib/server/store.ts` for setup-required messages.
+- [x] Export store functions for listing accounts, upserting accounts, listing updates, adding updates, creating OAuth states, consuming OAuth states, checking Telegram update IDs, recording Telegram update IDs, setting connector notices, and reading connector notices.
+- [x] Create `src/lib/server/config.ts`.
+- [x] Add `getRequiredServerEnv(name: string): string` to `src/lib/server/config.ts`.
+- [x] Make `getRequiredServerEnv` throw `Missing required environment variable: ${name}` when the requested value is absent.
+- [x] Add `.env.example` with placeholders for `APP_URL`, `X_CLIENT_ID`, `X_CLIENT_SECRET`, `X_REDIRECT_URI`, `TELEGRAM_OIDC_CLIENT_ID`, `TELEGRAM_OIDC_CLIENT_SECRET`, `TELEGRAM_OIDC_REDIRECT_URI`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET_TOKEN`, and optional `TELEGRAM_DEMO_CHANNEL_ID`.
+- [x] Run `pnpm run check`.
+- [x] Run `pnpm run lint`.
 
 ## Phase 1 — Load local state and render the profile UI
 
