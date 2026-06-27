@@ -1,5 +1,4 @@
 <script lang="ts">
-	import ConnectorPanel from '$lib/components/ConnectorPanel.svelte';
 	import Timeline from '$lib/components/Timeline.svelte';
 	import logoUrl from '../../weavr logo final.png';
 	import type { PageData } from './$types';
@@ -24,6 +23,7 @@
 </script>
 
 <svelte:head>
+<<<<<<< HEAD
 	<title>Weavr — Keep up with people, not platforms</title>
 	<meta
 		name="description"
@@ -149,6 +149,22 @@
 		{/if}
 	</div>
 {/if}
+=======
+	<title>Weavr — Demo Feed</title>
+</svelte:head>
+
+<main class="profile-page">
+	<header class="profile-header">
+		<h1>Weavr</h1>
+		<p class="profile-subtitle">Demo feed — mocked X (Twitter) posts from sample profiles.</p>
+	</header>
+
+	<section class="section">
+		<h2>Timeline</h2>
+		<Timeline updates={data.updates} hasAccounts={data.accounts.length > 0} />
+	</section>
+</main>
+>>>>>>> fd2ba79182c188ccae742ec1374e86256d7646e6
 
 <style>
 	.landing-page {
@@ -328,6 +344,7 @@
 	.limitations-card {
 		padding: clamp(1.4rem, 4vw, 2rem);
 	}
+<<<<<<< HEAD
 
 	.connectors-grid {
 		display: grid;
@@ -378,4 +395,6 @@
 			align-self: flex-start;
 		}
 	}
+=======
+>>>>>>> fd2ba79182c188ccae742ec1374e86256d7646e6
 </style>
