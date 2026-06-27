@@ -1,0 +1,266 @@
+# Weavr MVP Ingress Plan: X + Telegram
+
+## Summary
+Revise Weavr’s MVP ingress around **X** and **Telegram** as the first connectors. Do **not** use GitHub as a main connector, and do **not** make Instagram the first connector because Instagram media ingress typically requires Business/Creator account setup and Meta review.
+
+Updated product language:
+
+> Connect X and Telegram to bring your own public posts, forwarded updates, and channel posts into one Weavr profile.
+
+Primary MVP proof:
+- X can connect through OAuth 2.0 Authorization Code Flow with PKCE.
+- Telegram Login identifies the user.
+- A Weavr Telegram bot can receive a sent or forwarded message/media item and normalize it into `updates`.
+- Weavr renders normalized X/Telegram updates in one profile timeline.
+
+Official references used:
+- [X OAuth 2.0 Authorization Code Flow with PKCE](https://docs.x.com/fundamentals/authentication/oauth-2-0/authorization-code)
+- [Telegram Login / OIDC](https://core.telegram.org/bots/telegram-login)
+- [Telegram Bot API](https://core.telegram.org/bots/api)
+
+## Connector Decisions
+
+| Provider | MVP Status | Decision |
+|---|---:|---|
+| X | Primary connector | OAuth 2.0 PKCE, minimal scopes, fetch profile and recent posts where tier permits |
+| Telegram | Primary connector | Telegram Login/OIDC for identity plus bot/channel ingestion |
+| Instagram | Deferred | Not first connector due to Business/Creator and Meta setup/review friction |
+| GitHub | Deferred | Not a main connector for this MVP |
+| WhatsApp Status | Explicitly rejected | No automated status/friend update ingestion |
+| WhatsApp manual/share-sheet | Later | Possible future import path only |
+
+### X Connector
+Implement:
+
+- OAuth 2.0 Authorization Code Flow with PKCE.
+- Scopes: `tweet.read users.read offline.access`.
+- Store access token, refresh token, expiry, provider user ID, username, display name, and avatar if available.
+- Fetch connected user profile.
+- Fetch recent posts where API tier permits.
+- Normalize posts into `updates`.
+
+UI states:
+
+- `Connect X`
+- `Connected`
+- `Syncing`
+- `API access blocked`
+- `Rate limited`
+- `Needs reconnect`
+
+If API access blocks tweet fetching, the app must show a clear state:
+
+> X is connected, but this API tier does not allow post import yet.
+
+Do not silently fake live X imports as connected data.
+
+### Telegram Connector
+Implement:
+
+- Telegram Login / OIDC using scopes `openid profile`.
+- Store Telegram user ID, username, name, and profile photo.
+- Create a Weavr Telegram bot for ingestion.
+- Add a webhook endpoint to receive Bot API updates.
+- Normalize supported bot updates into `updates`.
+
+MVP ingestion modes:
+
+1. User sends or forwards a Telegram message/media to the Weavr bot.
+2. User connects a Telegram channel where the bot can read channel posts.
+3. Bot/channel updates are normalized into Weavr timeline updates.
+
+Do not claim:
+
+- Weavr can automatically read private Telegram chats.
+- Weavr can access contacts.
+- Weavr can read friends’ private updates.
+- Telegram Stories are supported today.
+
+Telegram Stories API should be listed as future research only.
+
+### WhatsApp Status Rejection
+Explicit product and implementation rule:
+
+- WhatsApp Status is **not** a primary MVP connector.
+- WhatsApp Business/Cloud APIs are for business messaging and webhook workflows, not consumer WhatsApp Status ingestion.
+- Weavr must not promise it can read WhatsApp statuses or friends’ WhatsApp updates.
+- WhatsApp can be considered later as a manual/share-sheet import path, not as automated connector ingestion.
+
+## Data Model Changes
+
+Use these core tables/entities:
+
+### `connected_accounts`
+Stores authenticated provider connections.
+
+| Field | Type | Required |
+|---|---|---|
+| id | uuid/string | yes |
+| user_id | uuid/string | yes |
+| provider | `x` \| `telegram` \| `instagram` \| `whatsapp_manual` | yes |
+| provider_user_id | string | yes |
+| username | string | optional |
+| display_name | string | optional |
+| avatar_url | string | optional |
+| access_token_encrypted | string | optional |
+| refresh_token_encrypted | string | optional |
+| token_expires_at | datetime | optional |
+| scopes | string[] | yes |
+| status | `connected` \| `blocked` \| `expired` \| `error` | yes |
+| last_synced_at | datetime | optional |
+| created_at | datetime | yes |
+| updated_at | datetime | yes |
+
+### `external_profiles`
+Stores non-authenticated profile links.
+
+| Field | Type | Required |
+|---|---|---|
+| id | uuid/string | yes |
+| user_id | uuid/string | yes |
+| provider | `x` \| `telegram` \| `instagram` \| `whatsapp_manual` | yes |
+| url | string | yes |
+| label | string | optional |
+| status | `linked` \| `unsupported` | yes |
+| created_at | datetime | yes |
+
+### `updates`
+Normalized timeline entries from X, Telegram bot messages, Telegram channels, and future providers.
+
+| Field | Type | Required |
+|---|---|---|
+| id | uuid/string | yes |
+| user_id | uuid/string | yes |
+| connected_account_id | uuid/string | optional |
+| provider | `x` \| `telegram` \| `instagram` \| `whatsapp_manual` | yes |
+| source_kind | `oauth_fetch` \| `bot_message` \| `channel_post` \| `forwarded_message` \| `linked_profile` | yes |
+| external_id | string | optional |
+| author_name | string | optional |
+| author_username | string | optional |
+| text | string | optional |
+| media_urls | string[] | optional |
+| external_url | string | optional |
+| occurred_at | datetime | yes |
+| ingested_at | datetime | yes |
+| visibility | `private` \| `public_link` | yes |
+| raw_payload | json | optional |
+
+### `sync_runs`
+Tracks connector sync attempts.
+
+| Field | Type | Required |
+|---|---|---|
+| id | uuid/string | yes |
+| connected_account_id | uuid/string | yes |
+| provider | `x` \| `telegram` | yes |
+| status | `success` \| `blocked` \| `rate_limited` \| `error` | yes |
+| started_at | datetime | yes |
+| finished_at | datetime | optional |
+| updates_created | number | yes |
+| error_code | string | optional |
+| error_message | string | optional |
+
+Provider enum:
+
+```ts
+type Provider = "x" | "telegram" | "instagram" | "whatsapp_manual";
+```
+
+## Implementation Plan
+
+### Phase 0: App Foundation
+- Build Weavr profile timeline around normalized `updates`.
+- Add connector status UI.
+- Add empty states for “No connected sources yet” and “Connected, waiting for updates.”
+- Keep Instagram and WhatsApp visible only as deferred/unsupported explanatory rows.
+
+Acceptance:
+- Timeline renders from normalized seed updates.
+- Connector dashboard shows X and Telegram as primary actions.
+
+### Phase 1: X OAuth
+- Add `/api/auth/x/start`.
+- Generate PKCE verifier/challenge and CSRF `state`.
+- Redirect to X authorization URL with scopes `tweet.read users.read offline.access`.
+- Add `/api/auth/x/callback`.
+- Exchange code for tokens.
+- Store account in `connected_accounts`.
+- Fetch X user profile.
+- Attempt recent post fetch where API tier permits.
+- Create `sync_runs` row for each attempt.
+- Normalize fetched posts into `updates`.
+
+Acceptance:
+- X connect path works end to end, or fails into a clear “API access blocked” state.
+- Connected X profile appears in Weavr.
+- If posts are available, they render in the timeline as X updates.
+
+### Phase 2: Telegram Login
+- Add Telegram Login/OIDC button.
+- Request scopes `openid profile`.
+- Validate ID token server-side.
+- Store Telegram identity in `connected_accounts`.
+- Show connected Telegram profile photo/name/username.
+
+Acceptance:
+- Telegram Login works.
+- Telegram account appears as connected.
+- No private chats or contacts are requested.
+
+### Phase 3: Telegram Bot Ingestion
+- Create/configure Weavr Telegram bot through BotFather.
+- Add webhook endpoint `/api/webhooks/telegram`.
+- Verify webhook secret/token.
+- Handle Bot API `message` updates for direct bot messages.
+- Handle forwarded messages using available origin metadata.
+- Handle `channel_post` updates when bot is added to a channel with permissions.
+- Normalize text, caption, photo/file references, sender/channel metadata, and timestamp into `updates`.
+
+Acceptance:
+- User can send at least one message to the bot and see it in Weavr.
+- User can forward at least one Telegram message/media item to the bot and see it in Weavr.
+- If bot is added to a channel, at least one channel post can appear in Weavr.
+- Unsupported Telegram updates are safely ignored and logged.
+
+### Phase 4: Trust, Polish, Demo
+- Add source badges: `X · Connected`, `Telegram · Bot`, `Telegram · Channel`, `Instagram · Deferred`, `WhatsApp · Manual later`.
+- Add connector limitation copy.
+- Add sync/error states.
+- Add responsive QA for mobile and desktop.
+- Prepare demo path: Connect Telegram → send/forward message → see update → connect X or show blocked-by-tier state → unified profile timeline.
+
+Acceptance:
+- Product does not overpromise platform access.
+- WhatsApp Status rejection is explicit.
+- X/Telegram updates render in one normalized profile timeline.
+
+## UI Copy Requirements
+
+Use this connector copy:
+
+- X: “Import your own public X posts where your API access allows it.”
+- Telegram Login: “Use Telegram to identify your Weavr account.”
+- Telegram Bot: “Send or forward messages to the Weavr bot to add them to your profile.”
+- Telegram Channel: “Add the bot to a channel to import posts the bot can receive.”
+- Instagram: “Planned later. Instagram media import requires additional Meta account setup and review.”
+- WhatsApp: “Weavr cannot read WhatsApp Status. WhatsApp may become a manual/share import path later.”
+
+## Acceptance Criteria For Today
+- X OAuth path is implemented, or blocked only by API access with a clear UI state.
+- X uses OAuth 2.0 Authorization Code Flow with PKCE.
+- X scopes are limited to `tweet.read users.read offline.access`.
+- Telegram Login works with `openid profile`.
+- Telegram connected account stores user ID, username, name, and profile photo.
+- Telegram bot receives at least one sent or forwarded message.
+- Received Telegram bot message is written into `updates`.
+- Telegram channel post ingestion is implemented if bot/channel setup is available; otherwise UI shows exact setup requirement.
+- Weavr profile renders normalized X and Telegram updates together.
+- WhatsApp Status is explicitly rejected as an automated MVP connector.
+- The app does not claim access to Instagram media, private Telegram chats, WhatsApp Status, contacts, or friends’ private updates.
+
+## Assumptions
+- The MVP represents the connected user’s own Weavr profile first.
+- X API tier may block recent post fetches; this is acceptable only if the blocked state is explicit.
+- Telegram Bot API webhook setup is available for the deployed app.
+- Token storage must be encrypted or abstracted behind a server-only storage layer before public launch.
+- Instagram and WhatsApp remain visible only as future/deferred trust-building notes, not working connectors.

@@ -1,0 +1,408 @@
+You are a senior hackathon product manager, UX designer, and full-stack technical lead. Create a concrete, build-ready MVP plan for the product below. Your output will later be given to Codex to implement the app, so be decisive, technically realistic, and specific.
+
+## Product concept
+
+Working name: **Weavr**
+
+### Core problem
+
+Keeping up with friends is difficult because their updates are scattered across platforms.
+
+One friend posts photos on Instagram. Another shares thoughts on X. Someone updates LinkedIn when they get a new job. Another appears to communicate emotionally through GitHub commits.
+
+People follow platforms, but lose track of people.
+
+### Product promise
+
+Loom is a people-first social update aggregator. Instead of opening several apps and feeds, a user opens Loom and sees a simple profile for each friend, containing their recent posts, photos, milestones, links, and activity from different sources.
+
+The organising principle is not “what is trending on a platform?” but “what has happened in the life of someone I care about?”
+
+### Product positioning
+
+Loom should feel personal, calm, warm, and slightly playful.
+
+It is not intended to replace Instagram, LinkedIn, X, TikTok, or GitHub. It is a lightweight layer that helps users stay connected to friends across those platforms.
+
+The emotional insight is:
+
+> Social media was supposed to make us feel more connected, but it became an endless competition for attention. Loom brings it back to keeping up with friends, not feeds.
+
+## Hackathon constraint
+
+Assume this must be built as a polished demoable MVP within **6 hours** by 2 people.
+
+Prioritise:
+
+* A compelling live demo
+* Clear user value within the first minute
+* A visually strong, coherent product
+* Technical feasibility
+* Minimal dependencies on unavailable social-media APIs
+* A clear path to becoming a real product later
+
+Do not design an overbuilt social network.
+
+## Important feasibility constraint
+
+Do not assume unrestricted API access to Instagram, LinkedIn, X, TikTok, or other closed platforms. Use some OAuth thing.
+
+The MVP should use a practical combination of:
+
+1. Seeded/demo data for platforms without accessible APIs
+2. User-submitted profile links
+3. Manually created update cards where necessary
+4. One or two technically realistic live integrations where possible, especially GitHub public activity
+5. Clearly labelled “connected” versus “demo” sources where useful
+
+Do not recommend scraping private or restricted platforms.
+
+## Target user
+
+Primary user:
+
+* A university student or young working adult
+* Follows friends across multiple platforms
+* Cares about keeping up with people but feels overwhelmed by algorithmic feeds
+* Does not want another addictive social-media app
+* Wants a quieter, more intentional way to see meaningful updates from friends
+
+## Core MVP experience
+
+The MVP must make this flow work beautifully:
+
+1. User lands on Weavr.
+2. User sees a home screen with a small set of friends.
+3. Each friend has a recognisable profile card with a recent activity summary.
+4. User clicks a friend.
+5. User sees a single chronological “life stream” for that person.
+6. Updates can include different source types:
+
+   * Instagram-style photo post
+   * X-style text thought
+   * LinkedIn-style career milestone
+   * GitHub-style commit, repository, or contribution update
+   * Personal update or milestone
+   * Link to an external profile or post
+7. User can quickly understand: “What has been happening in this person’s life recently?”
+8. The product delivers at least one memorable, funny demo moment involving GitHub activity being treated like an emotional life update.
+
+Example:
+
+* “Chris pushed 14 commits at 2:43 AM.”
+* “Chris updated README.md again. Is he okay?”
+* “Keith has been emotionally expressive through GitHub commits.”
+
+## Required product decisions
+
+Make a recommendation for each item below. Do not provide multiple vague options unless there is a clear tradeoff.
+
+### 1. MVP scope
+
+Define:
+
+* The exact minimum feature set for demo day
+* Features that are explicitly out of scope
+* Features that should be deferred to a post-hackathon version
+
+### 2. Primary user flows
+
+Specify step-by-step flows for:
+
+* First-time user onboarding
+* Adding or selecting friends
+* Viewing the home screen
+* Opening a friend profile
+* Viewing individual updates
+* Adding a manual update
+* Connecting or linking an external account
+* Handling a friend with no recent updates
+
+### 3. Information architecture
+
+Define the exact screens/routes required.
+
+At minimum, consider:
+
+* Landing page
+* Home / friend directory
+* Friend profile page
+* Add friend flow
+* Add update flow
+* Settings or data-source connection screen, only if truly necessary
+* Optional demo mode
+
+For each screen, state:
+
+* Purpose
+* Main UI elements
+* User actions
+* Empty states
+* Error states
+* Success states
+
+### 4. UX and visual direction
+
+Describe a visual system that feels:
+
+* Calm
+* Personal
+* Human
+* Modern
+* Slightly nostalgic or scrapbook-like, but not childish
+* More intimate than a conventional social feed
+
+Include:
+
+* Recommended layout
+* Card design
+* Timeline design
+* Source indicators
+* Typography direction
+* Use of profile photos and imagery
+* Motion or micro-interactions worth implementing
+* Accessibility considerations
+* How to avoid making the interface feel like another noisy feed
+
+Avoid generic “glassmorphism dashboard” design language.
+
+### 5. Data model
+
+Provide a practical MVP database schema.
+
+Include entities such as:
+
+* User
+* Friend
+* FriendProfile
+* SourceAccount
+* Update
+* MediaAsset
+* Link
+* SourceType
+
+For each entity, specify:
+
+* Fields
+* Data types
+* Required versus optional fields
+* Relationships
+* Example records
+
+Ensure the model supports:
+
+* One friend having multiple sources
+* One timeline containing mixed-source updates
+* Manual/demo/live updates
+* Source attribution
+* Timestamps
+* External URLs
+* Optional media
+* Privacy/visibility flags suitable for future expansion
+
+### 6. Update normalisation model
+
+Design a common update format that allows Instagram-style photos, LinkedIn milestones, GitHub commits, text posts, and manual life events to appear in one timeline.
+
+Specify:
+
+* Required fields
+* Optional fields
+* Update types
+* Source metadata
+* Display rules by type
+* What content should appear in the card preview
+* What appears in an expanded detail view
+
+### 7. Integration strategy
+
+Recommend the most realistic integration plan for the MVP.
+
+For each source below, state whether it should be:
+
+* Live integration
+* Mocked/seeded data
+* Manual link/profile connection
+* Explicitly deferred
+
+Sources:
+
+* GitHub
+* Instagram
+* LinkedIn
+* X
+* TikTok
+* Personal/manual updates
+
+Explain why.
+
+Prioritise GitHub as the strongest candidate for a real integration if feasible.
+
+### 8. Technical architecture
+
+Recommend a simple, modern, hackathon-friendly stack.
+
+Prefer a stack such as:
+
+* Next.js
+* TypeScript
+* Tailwind CSS
+* Supabase or a similarly simple managed backend
+* Vercel deployment
+* GitHub API for public activity where useful
+
+For the recommended stack, specify:
+
+* Frontend framework
+* Backend/data layer
+* Authentication approach
+* Database
+* File/media storage
+* API routes or server actions
+* Environment variables
+* Deployment plan
+* Any libraries needed for dates, icons, forms, validation, animation, or UI primitives
+
+Keep the architecture simple enough for Codex to implement quickly.
+
+### 9. File and component architecture
+
+Propose a clear file structure for the application.
+
+Include:
+
+* Routes/pages
+* Reusable UI components
+* Data-access utilities
+* API/integration utilities
+* Types
+* Seed data
+* Styling
+* Configuration
+* Environment variable handling
+
+Name components and files precisely.
+
+### 10. Build order
+
+Provide a strict implementation sequence that minimises risk.
+
+Split the work into:
+
+* Phase 0: Setup
+* Phase 1: Static visual prototype
+* Phase 2: Seeded functional MVP
+* Phase 3: Live GitHub integration
+* Phase 4: Polish and demo preparation
+
+For each phase include:
+
+* Goal
+* Specific tasks
+* Dependencies
+* Acceptance criteria
+* What can be cut if time becomes limited
+
+### 11. Acceptance criteria
+
+Create clear testable criteria for the MVP.
+
+Examples:
+
+* A user can see at least 5 friend cards on the home page.
+* Each friend has a profile with a mixed-source timeline.
+* At least 4 update types render distinctly.
+* A GitHub update can be shown using either seeded data or a live public GitHub profile.
+* A user can add a manual life update.
+* The app works on desktop and mobile.
+* The demo does not rely on unavailable third-party API credentials.
+
+Add more criteria where needed.
+
+### 12. Demo data plan
+
+Create a set of realistic seeded demo personas and updates.
+
+Include at least:
+
+* Chris: developer whose GitHub activity is treated as emotional communication
+* A friend with Instagram-style travel/photo updates
+* A friend with a LinkedIn-style career milestone
+* A friend with text thoughts or micro-posts
+* A friend with very few updates, to show an empty/quiet state
+
+For each persona, provide:
+
+* Name
+* Short bio
+* Avatar concept
+* Connected source types
+* 5–8 sample updates
+* Dates
+* Tone
+* Relevant external links or mock URLs
+
+Ensure the content is warm, believable, and occasionally funny.
+
+### 13. Privacy and trust
+
+Include a lightweight MVP privacy model.
+
+Address:
+
+* Consent and friend ownership
+* Public versus private links
+* Why the MVP should not imply access to private social-media content
+* How the interface can make source visibility understandable
+* What needs to change before a public launch
+
+### 14. Risks and mitigations
+
+Identify the main risks, including:
+
+* Social-media API restrictions
+* Incomplete or stale updates
+* Privacy concerns
+* Product seeming like a generic feed reader
+* Building too much
+* Data-quality inconsistency across sources
+
+For each risk, propose a practical hackathon mitigation.
+
+### 15. Final recommendation
+
+End with:
+
+1. A concise recommended MVP definition in one paragraph
+2. The exact recommended technical stack
+3. The five most important screens
+4. The three features that will create the strongest demo impression
+5. The three features to cut first if time is running out
+6. A 60-second demo script for judges
+
+## Output format
+
+Use the exact structure below:
+
+1. Product thesis
+2. MVP scope
+3. Explicit non-goals
+4. User stories
+5. User flows
+6. Screen-by-screen specification
+7. UX and visual direction
+8. Data model and schema
+9. Update normalisation model
+10. Integration strategy
+11. Technical architecture
+12. File and component structure
+13. Build plan by phase
+14. Acceptance criteria
+15. Demo data plan
+16. Privacy and trust model
+17. Risks and mitigations
+18. Final recommendation
+19. 60-second judge demo script
+20. Suggested next Codex implementation prompt
+
+Be concrete. Use tables where useful. Do not write production code yet. Do not ask follow-up questions. Make sensible assumptions and clearly label them.

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Weavr Ingress MVP</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <section class="profile">
+        <div>
+          <p class="eyebrow">Weavr MVP</p>
+          <h1>Your unified profile timeline</h1>
+          <p class="lede">Connect X and Telegram to bring your own public posts, forwarded updates, and channel posts into one Weavr profile.</p>
+        </div>
+        <div class="profile-card">
+          <span class="avatar">W</span>
+          <div>
+            <strong>Demo profile</strong>
+            <span id="connection-count">No connected sources yet</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <aside class="connectors">
+          <div class="section-heading">
+            <h2>Sources</h2>
+            <span id="sync-state">Ready</span>
+          </div>
+          <div id="connectors"></div>
+        </aside>
+
+        <section class="timeline-panel">
+          <div class="section-heading">
+            <h2>Timeline</h2>
+            <button id="demo-telegram">Add demo Telegram update</button>
+          </div>
+          <div id="empty-state" class="empty">Connected, waiting for updates.</div>
+          <div id="timeline" class="timeline"></div>
+        </section>
+      </section>
+
+      <section class="trust">
+        <h2>Access boundaries</h2>
+        <p>Weavr does not claim access to Instagram media, private Telegram chats, Telegram contacts, WhatsApp Status, contacts, or friends' private updates.</p>
+        <p>Telegram Stories are future research only.</p>
+      </section>
+    </main>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
