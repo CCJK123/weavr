@@ -2,7 +2,9 @@
 
 Action checklist for implementing the MVP. Product scope, limitations, and guardrails are in `OUTLINE.md`.
 
-> **End-of-phase verification (every phase):** run `pnpm run check`, `pnpm run lint`, then build + temporarily deploy with `pnpm run deploy:temporary` and curl the deployed URL to verify the app works as expected. Fix anything broken before moving on. Note: a freshly deployed temporary worker may need ~30s before its TLS cert responds.
+> **End-of-phase verification (every phase):** run `pnpm run check`, `pnpm run lint`, then build + deploy with `npx wrangler deploy` and curl the deployed URL to verify the app works as expected. Fix anything broken before moving on.
+>
+> **Plan change (Phase 3 onward):** Real X OAuth and Telegram integration are deferred — the X API is pay-per-use with no free tier, and the scope is reduced to a mocked feed. The MVP now ships a mocked X (Twitter) feed seeded into the in-memory store (see Phase 3M). Phases 3–6 below are retained for reference but are deferred / out of scope for the current MVP.
 
 ## Phase 0 — Confirm baseline and create MVP primitives
 
@@ -72,7 +74,27 @@ for now (data is lost when a Worker isolate recycles — demo-only).
 - [x] Record the selected provider test mode in `README.md`.
 - [x] Document `APP_URL` configuration against the claimed deployment URL in `README.md` (set the literal value once the temporary deploy is claimed).
 
+## Phase 3M — Mock X feed (current MVP)
+
+Real X OAuth + API access is deferred. The MVP renders a mocked X (Twitter)
+feed seeded into the in-memory store so the timeline works with no provider
+credentials.
+
+- [x] Create `src/lib/server/mockData.ts` with sample X profiles and mocked tweets.
+- [x] Add an idempotent `seedMockData()` that pushes mocked `Update` records into the in-memory store (safe to call from the page load).
+- [x] Seed mocked X updates with `provider: 'x'`, `sourceKind: 'oauth_fetch'`, `authorUsername`, `text`, `externalUrl`, and staggered `occurredAt` timestamps.
+- [x] Call `seedMockData()` from `src/routes/+page.server.ts` before listing updates.
+- [x] Replace the connectors UI with a clean demo-feed page (drop the broken Connect X / Telegram buttons and the connectors section).
+- [x] Remove the unused `ConnectorPanel.svelte` component.
+- [x] Remove the untracked Telegram Login provider, PKCE helper, and Telegram auth routes (out of scope).
+- [x] Verify the deployed Worker returns HTTP 200 and the mocked profiles render in the SSR HTML.
+- [x] Run `pnpm run check`.
+- [x] Run `pnpm run lint`.
+- [x] Build and deploy with `npx wrangler deploy`.
+
 ## Phase 3 — Implement X OAuth and one import attempt
+
+> Deferred in favor of the mock feed (Phase 3M). Real X OAuth routes and provider remain in the codebase but are unlinked from the UI; they require paid X API credits and worker secrets to function.
 
 - [x] Create `src/lib/server/providers/x.ts`.
 - [x] Add X constants for `https://x.com/i/oauth2/authorize`, `https://api.x.com/2/oauth2/token`, `https://api.x.com/2`, and scopes `tweet.read users.read offline.access`.
@@ -111,32 +133,36 @@ for now (data is lost when a Worker isolate recycles — demo-only).
 
 ## Phase 4 — Implement Telegram Login identity
 
-- [ ] Select `/api/auth/telegram/start` and `/api/auth/telegram/callback` as the Telegram Login/OIDC route paths for the local MVP.
-- [ ] Create `src/lib/server/providers/telegramLogin.ts`.
-- [ ] Select Telegram OIDC Authorization Code with PKCE as the Telegram identity flow for the local MVP.
-- [ ] Add Telegram Login/OIDC constants for issuer `https://oauth.telegram.org`, authorization URL `https://oauth.telegram.org/auth`, token URL `https://oauth.telegram.org/token`, redirect URI from `TELEGRAM_OIDC_REDIRECT_URI`, and scopes `openid profile`.
-- [ ] Add Telegram Login/OIDC helpers for auth URL creation, token exchange, and server-side identity validation.
-- [ ] Validate Telegram identity by checking signature or token validity, issuer, audience/client ID, expiry, issued-at time, nonce, and OAuth state.
-- [ ] Add lazy Telegram Login config readers for `TELEGRAM_OIDC_CLIENT_ID`, `TELEGRAM_OIDC_CLIENT_SECRET`, and `TELEGRAM_OIDC_REDIRECT_URI`.
-- [ ] Create `src/routes/api/auth/telegram/start/+server.ts`.
-- [ ] Create `src/routes/api/auth/telegram/callback/+server.ts`.
-- [ ] Request Telegram Login scopes exactly `openid profile`.
-- [ ] Validate the returned Telegram identity server-side.
-- [ ] Store the connected Telegram account in the in-memory store.
-- [ ] Store Telegram user ID, username, name, and avatar URL when available.
-- [ ] Wire the Telegram Login connector action row to the Telegram Login start route.
+> Deferred — out of scope for the current mock-feed MVP.
+
+- [x] Select `/api/auth/telegram/start` and `/api/auth/telegram/callback` as the Telegram Login/OIDC route paths for the local MVP.
+- [x] Create `src/lib/server/providers/telegramLogin.ts`.
+- [x] Select Telegram OIDC Authorization Code with PKCE as the Telegram identity flow for the local MVP.
+- [x] Add Telegram Login/OIDC constants for issuer `https://oauth.telegram.org`, authorization URL `https://oauth.telegram.org/auth`, token URL `https://oauth.telegram.org/token`, redirect URI from `TELEGRAM_OIDC_REDIRECT_URI`, and scopes `openid profile`.
+- [x] Add Telegram Login/OIDC helpers for auth URL creation, token exchange, and server-side identity validation.
+- [x] Validate Telegram identity by checking signature or token validity, issuer, audience/client ID, expiry, issued-at time, nonce, and OAuth state.
+- [x] Add lazy Telegram Login config readers for `TELEGRAM_OIDC_CLIENT_ID`, `TELEGRAM_OIDC_CLIENT_SECRET`, and `TELEGRAM_OIDC_REDIRECT_URI`.
+- [x] Create `src/routes/api/auth/telegram/start/+server.ts`.
+- [x] Create `src/routes/api/auth/telegram/callback/+server.ts`.
+- [x] Request Telegram Login scopes exactly `openid profile`.
+- [x] Validate the returned Telegram identity server-side.
+- [x] Store the connected Telegram account in the in-memory store.
+- [x] Store Telegram user ID, username, name, and avatar URL when available.
+- [x] Wire the Telegram Login connector action row to the Telegram Login start route.
 - [ ] Verify Telegram Login allowed URLs match the selected Telegram Login callback URL before real Telegram Login testing.
-- [ ] Render the connected Telegram name, username, and avatar URL when available.
-- [ ] Verify Telegram Login does not request private chat access.
-- [ ] Verify Telegram Login does not request contact access.
-- [ ] Verify Telegram Login does not request phone-number access.
-- [ ] Verify Telegram Login does not imply access to friends’ private updates.
-- [ ] Verify Telegram Login does not imply Telegram Stories support.
-- [ ] Verify Telegram profile-photo media is not downloaded or stored.
-- [ ] Run `pnpm run check`.
-- [ ] Run `pnpm run lint`.
+- [x] Render the connected Telegram name, username, and avatar URL when available.
+- [x] Verify Telegram Login does not request private chat access.
+- [x] Verify Telegram Login does not request contact access.
+- [x] Verify Telegram Login does not request phone-number access.
+- [x] Verify Telegram Login does not imply access to friends’ private updates.
+- [x] Verify Telegram Login does not imply Telegram Stories support.
+- [x] Verify Telegram profile-photo media is not downloaded or stored.
+- [x] Run `pnpm run check`.
+- [x] Run `pnpm run lint`.
 
 ## Phase 5 — Implement Telegram bot ingestion
+
+> Deferred — out of scope for the current mock-feed MVP.
 
 - [ ] Create `src/lib/server/providers/telegramBot.ts`.
 - [ ] Add Telegram Bot API constants and Telegram update parsing helpers to `src/lib/server/providers/telegramBot.ts`.
@@ -176,6 +202,8 @@ for now (data is lost when a Worker isolate recycles — demo-only).
 - [ ] Run `pnpm run lint`.
 
 ## Phase 6 — Document and run the demo
+
+> Partially superseded. The README is updated for the mock-feed MVP below; the full live-demo checklist is deferred until real providers are reintroduced.
 
 - [ ] Update `README.md` with the local development command.
 - [ ] Update `README.md` with feature-specific env var placeholders and descriptions.

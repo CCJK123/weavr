@@ -67,53 +67,25 @@ Preview the production build locally:
 pnpm run preview
 ```
 
-## Cloudflare Workers deploy (provider test mode: `claimed_cloudflare`)
+## Cloudflare Workers deploy
 
 Weavr runs on Cloudflare Workers via `@sveltejs/adapter-cloudflare`. The MVP
 uses an in-memory store inside the Worker, so data is lost when a Worker
 isolate recycles — this is demo-only until durable storage is added.
 
-Real X OAuth callbacks and Telegram webhooks need a stable HTTPS URL, so the
-provider test mode is `claimed_cloudflare` (the local-only / local-tunnel
-approach is vetoed): deploy a temporary Worker, then claim it to your
-Cloudflare account so it persists.
-
-### Deploy and claim
+### Deploy
 
 ```sh
-pnpm run deploy:temporary
+pnpm run build && npx wrangler deploy
 ```
 
-Wrangler prints two URLs:
+The MVP renders a **mocked X (Twitter) feed** seeded into the in-memory
+store, so it works with no provider credentials configured. Real X OAuth
+and Telegram integration are deferred (the X API is pay-per-use with no
+free tier).
 
-- a **deployment URL** (the live site), and
-- a **claim URL** (opens the Cloudflare dashboard).
-
-Open the claim URL in your browser while signed into your Cloudflare account
-**before the 60-minute window expires**. Claiming attaches the temporary
-deployment to your account so it becomes a persistent HTTPS URL you can use
-for OAuth redirect URIs and webhook registration.
-
-### Configure `APP_URL`
-
-After claiming, set `APP_URL` to the claimed deployment URL. The X and
-Telegram callback helpers read this to build redirect URIs:
-
-```sh
-APP_URL=https://weavr.mountainous-turret.workers.dev
-```
-
-> Current claimed deployment: `https://weavr.mountainous-turret.workers.dev`.
-> `APP_URL` is read lazily via `$env/dynamic/private`, so it is only needed
-> once Phase 3 (X OAuth) lands; the profile page renders without it. Set it
-> as a Worker secret (`wrangler secret put APP_URL`) or in local `.env`.
-
-Provider-specific values (`X_CLIENT_ID`, `X_REDIRECT_URI`,
-`TELEGRAM_OIDC_CLIENT_ID`, `TELEGRAM_OIDC_CLIENT_SECRET`,
-`TELEGRAM_OIDC_REDIRECT_URI`, `TELEGRAM_BOT_TOKEN`,
-`TELEGRAM_WEBHOOK_SECRET_TOKEN`, optional `TELEGRAM_DEMO_CHANNEL_ID`) are
-added in later phases. The profile page renders without any provider
-credentials configured.
-
-> Unclaimed temporary deploys expire in 60 minutes and are for quick UI smoke
-> tests only. Always claim before real OAuth or webhook testing.
+> Current deployment: `https://weavr.mountainous-turret.workers.dev`.
+>
+> The mocked feed is seeded on each page load (idempotent per Worker
+> isolate). Because the store is in-memory, a recycled isolate re-seeds on
+> the next request — this is the accepted MVP tradeoff.
