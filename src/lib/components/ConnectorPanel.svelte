@@ -50,17 +50,27 @@
 
 <div class="connector-panel" data-status={status}>
 	<div class="connector-header">
-		<h3>{title}</h3>
+		<div>
+			<p class="connector-kicker">Source</p>
+			<h3>{title}</h3>
+		</div>
 		<span class="status-badge" data-status={status}>{statusLabels[status]}</span>
 	</div>
+
 	<p class="description">{description}</p>
+
 	{#if notice}
 		<p class="notice">{notice}</p>
 	{/if}
+
 	{#if showIdentity}
 		<div class="identity">
 			{#if avatarUrl}
-				<img class="avatar" src={avatarUrl} alt="" width="32" height="32" />
+				<img class="avatar" src={avatarUrl} alt="" width="40" height="40" />
+			{:else}
+				<div class="avatar-fallback" aria-hidden="true">
+					{(displayName ?? username ?? title)[0]}
+				</div>
 			{/if}
 			<div class="identity-text">
 				{#if displayName}<span class="display-name">{displayName}</span>{/if}
@@ -68,6 +78,7 @@
 			</div>
 		</div>
 	{/if}
+
 	{#if showAction && resolvedHref}
 		<a class="action-button" href={resolvedHref}>{actionLabel}</a>
 	{/if}
@@ -75,114 +86,162 @@
 
 <style>
 	.connector-panel {
-		background: var(--color-surface);
+		background: rgba(255, 255, 255, 0.86);
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius);
-		padding: 1.25rem;
+		padding: clamp(1.1rem, 3vw, 1.45rem);
 		display: flex;
 		flex-direction: column;
-		gap: 0.5rem;
+		gap: 0.75rem;
+		box-shadow: 0 10px 28px rgba(20, 35, 42, 0.035);
+		transition:
+			border-color var(--transition),
+			box-shadow var(--transition),
+			transform var(--transition);
+	}
+
+	.connector-panel:hover {
+		border-color: rgba(107, 184, 173, 0.42);
+		box-shadow: var(--shadow-hover);
+		transform: translateY(-1px);
 	}
 
 	.connector-header {
 		display: flex;
-		align-items: center;
+		align-items: flex-start;
 		justify-content: space-between;
+		gap: 1rem;
+	}
+
+	.connector-kicker {
+		color: var(--color-text-muted);
+		font-size: 0.72rem;
+		font-weight: 700;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
 	}
 
 	.connector-header h3 {
-		font-size: 1.1rem;
+		font-size: 1.18rem;
+		margin-top: 0.15rem;
 	}
 
 	.status-badge {
-		font-size: 0.75rem;
-		font-weight: 600;
-		padding: 0.2rem 0.6rem;
+		border: 1px solid var(--color-border);
+		background: var(--color-surface-soft);
+		color: var(--color-text-muted);
+		font-size: 0.72rem;
+		font-weight: 700;
+		padding: 0.26rem 0.62rem;
 		border-radius: 999px;
 		text-transform: uppercase;
-		letter-spacing: 0.03em;
+		letter-spacing: 0.05em;
+		white-space: nowrap;
 	}
 
 	.status-badge[data-status='connected'] {
-		background: var(--color-status-connected);
-		color: #fff;
+		background: rgba(144, 205, 195, 0.18);
+		border-color: rgba(76, 154, 131, 0.28);
+		color: #2d7668;
 	}
 
 	.status-badge[data-status='blocked'],
 	.status-badge[data-status='error'],
 	.status-badge[data-status='needs_reconnect'] {
-		background: var(--color-status-error);
-		color: #fff;
+		background: rgba(180, 95, 95, 0.11);
+		border-color: rgba(180, 95, 95, 0.25);
+		color: #8c4545;
 	}
 
 	.status-badge[data-status='rate_limited'],
 	.status-badge[data-status='setup_required'] {
-		background: var(--color-status-warning);
-		color: #fff;
-	}
-
-	.status-badge[data-status='idle'] {
-		background: var(--color-border);
-		color: var(--color-text-muted);
+		background: rgba(168, 121, 52, 0.11);
+		border-color: rgba(168, 121, 52, 0.24);
+		color: #7a5b2b;
 	}
 
 	.description {
 		color: var(--color-text);
-		font-size: 0.95rem;
+		font-size: 0.96rem;
 	}
 
 	.notice {
+		border-left: 2px solid var(--color-brand);
+		padding: 0.55rem 0 0.55rem 0.8rem;
 		color: var(--color-text-muted);
-		font-size: 0.85rem;
-		font-style: italic;
+		font-size: 0.88rem;
+		background: linear-gradient(90deg, rgba(144, 205, 195, 0.12), transparent);
+		border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 	}
 
 	.identity {
 		display: flex;
 		align-items: center;
-		gap: 0.6rem;
-		margin-top: 0.25rem;
+		gap: 0.7rem;
+		margin-top: 0.15rem;
 	}
 
-	.avatar {
-		width: 32px;
-		height: 32px;
+	.avatar,
+	.avatar-fallback {
+		width: 40px;
+		height: 40px;
 		border-radius: 50%;
-		object-fit: cover;
 		border: 1px solid var(--color-border);
+		object-fit: cover;
+	}
+
+	.avatar-fallback {
+		display: grid;
+		place-items: center;
+		background: rgba(144, 205, 195, 0.22);
+		font-weight: 750;
+		color: var(--color-text);
+		text-transform: uppercase;
 	}
 
 	.identity-text {
 		display: flex;
 		flex-direction: column;
-		line-height: 1.2;
+		line-height: 1.25;
 	}
 
 	.display-name {
-		font-size: 0.9rem;
-		font-weight: 600;
+		font-size: 0.92rem;
+		font-weight: 700;
 		color: var(--color-text);
 	}
 
 	.username {
-		font-size: 0.8rem;
+		font-size: 0.82rem;
 		color: var(--color-text-muted);
 	}
 
 	.action-button {
 		align-self: flex-start;
-		background: var(--color-accent);
-		color: #fff;
+		background: var(--color-brand);
+		color: var(--color-text);
 		text-decoration: none;
-		padding: 0.5rem 1.25rem;
-		border-radius: var(--radius);
+		padding: 0.62rem 1.1rem;
+		border-radius: 999px;
 		font-size: 0.9rem;
-		font-weight: 500;
-		transition: background 0.15s ease;
-		margin-top: 0.25rem;
+		font-weight: 700;
+		transition:
+			background var(--transition),
+			box-shadow var(--transition),
+			transform var(--transition);
+		margin-top: 0.15rem;
+		box-shadow: 0 12px 28px rgba(107, 184, 173, 0.18);
 	}
 
 	.action-button:hover {
-		background: var(--color-accent-hover);
+		background: var(--color-brand-hover);
+		box-shadow: 0 16px 34px rgba(107, 184, 173, 0.24);
+		transform: translateY(-1px);
+	}
+
+	@media (max-width: 560px) {
+		.connector-header {
+			flex-direction: column;
+		}
 	}
 </style>
