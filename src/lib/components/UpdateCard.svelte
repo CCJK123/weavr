@@ -34,9 +34,7 @@
 					<span>{handle}</span>
 				{/if}
 				<span class="source-label">{sourceLabels[update.sourceKind]}</span>
-				<time datetime={update.occurredAt}
-					>{new Date(update.occurredAt).toLocaleString()}</time
-				>
+				<time datetime={update.occurredAt}>{new Date(update.occurredAt).toLocaleString()}</time>
 			</div>
 		</div>
 	</header>
@@ -47,12 +45,7 @@
 
 	{#if update.externalUrl}
 		<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- external URL -->
-		<a
-			class="external-link"
-			href={update.externalUrl}
-			target="_blank"
-			rel="noopener noreferrer"
-		>
+		<a class="external-link" href={update.externalUrl} target="_blank" rel="noopener noreferrer">
 			View original
 		</a>
 	{/if}
