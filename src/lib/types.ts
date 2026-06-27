@@ -3,7 +3,7 @@
 // local in-memory MVP shape, not the durable public-launch schema.
 
 /** Providers supported by the local MVP. */
-export type Provider = 'x' | 'telegram';
+export type Provider = 'x' | 'telegram' | 'instagram';
 
 /** Lifecycle of a connected provider account. */
 export type ConnectedAccountStatus =
@@ -14,7 +14,12 @@ export type ConnectedAccountStatus =
 	| 'error';
 
 /** Where a normalized timeline update came from. */
-export type UpdateSourceKind = 'oauth_fetch' | 'bot_message' | 'forwarded_message' | 'channel_post';
+export type UpdateSourceKind =
+	| 'oauth_fetch'
+	| 'bot_message'
+	| 'forwarded_message'
+	| 'channel_post'
+	| 'instagram_post';
 
 /** A normalized provider connection for the demo profile. */
 export interface ConnectedAccount {
@@ -36,7 +41,9 @@ export interface Update {
 	externalId?: string;
 	authorName?: string;
 	authorUsername?: string;
+	authorAvatarUrl?: string;
 	text?: string;
+	mediaUrls?: string[];
 	externalUrl?: string;
 	occurredAt: string;
 	ingestedAt: string;

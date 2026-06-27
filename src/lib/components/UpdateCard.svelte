@@ -1,14 +1,27 @@
 <script lang="ts">
 	import type { Update } from '$lib/types';
+	import SourceIcon from './SourceIcon.svelte';
 
 	let { update }: { update: Update } = $props();
 
-	const sourceLabels: Record<Update['sourceKind'], string> = {
-		oauth_fetch: 'From X',
-		bot_message: 'From Telegram',
-		forwarded_message: 'Telegram · Forwarded',
-		channel_post: 'Telegram · Channel'
-	};
+	const sourceLabel = $derived.by(() => {
+		switch (update.provider) {
+			case 'x':
+				return 'From X';
+			case 'instagram':
+				return 'From Instagram';
+			case 'telegram': {
+				switch (update.sourceKind) {
+					case 'forwarded_message':
+						return 'Telegram · Forwarded';
+					case 'channel_post':
+						return 'Telegram · Channel';
+					default:
+						return 'From Telegram';
+				}
+			}
+		}
+	});
 
 	const displayName = $derived(update.authorName ?? update.authorUsername ?? 'Demo profile');
 	const handle = $derived(update.authorUsername ? `@${update.authorUsername}` : undefined);
@@ -26,14 +39,21 @@
 	<span class="timeline-dot" aria-hidden="true"></span>
 
 	<header class="person-row">
-		<div class="avatar" aria-hidden="true">{initials}</div>
+		{#if update.authorAvatarUrl}
+			<img class="avatar" src={update.authorAvatarUrl} alt="" />
+		{:else}
+			<div class="avatar" aria-hidden="true">{initials}</div>
+		{/if}
 		<div class="person-copy">
 			<h2>{displayName}</h2>
 			<div class="update-meta">
 				{#if handle}
 					<span>{handle}</span>
 				{/if}
-				<span class="source-label">{sourceLabels[update.sourceKind]}</span>
+				<span class="source-label">
+					<SourceIcon provider={update.provider} />
+					<span>{sourceLabel}</span>
+				</span>
 				<time datetime={update.occurredAt}>{new Date(update.occurredAt).toLocaleString()}</time>
 			</div>
 		</div>
@@ -41,6 +61,20 @@
 
 	{#if update.text}
 		<p class="update-text">{update.text}</p>
+	{/if}
+
+	{#if update.mediaUrls && update.mediaUrls.length > 0}
+		{#if update.mediaUrls.length === 1}
+			<div class="media-row">
+				<img class="update-media" src={update.mediaUrls[0]} alt="" loading="lazy" />
+			</div>
+		{:else}
+			<div class="media-grid">
+				{#each update.mediaUrls as url (url)}
+					<img class="update-media" src={url} alt="" loading="lazy" />
+				{/each}
+			</div>
+		{/if}
 	{/if}
 
 	{#if update.externalUrl}
@@ -127,12 +161,20 @@
 	}
 
 	.source-label {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
 		font-weight: 650;
 		padding: 0.12rem 0.5rem;
 		border-radius: 999px;
 		border: 1px solid var(--color-border);
 		background: var(--color-surface-soft);
 		color: var(--color-text-muted);
+	}
+
+	img.avatar {
+		display: block;
+		object-fit: cover;
 	}
 
 	time {
@@ -144,6 +186,28 @@
 		line-height: 1.7;
 		white-space: pre-wrap;
 		word-break: break-word;
+	}
+
+	.update-media {
+		width: 100%;
+		object-fit: cover;
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-sm);
+		display: block;
+	}
+
+	.media-row .update-media {
+		max-height: 360px;
+	}
+
+	.media-grid {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 0.5rem;
+	}
+
+	.media-grid .update-media {
+		height: 180px;
 	}
 
 	.external-link {

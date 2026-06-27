@@ -16,6 +16,46 @@
 		event.preventDefault();
 		view = 'landing';
 	};
+
+	type Person = {
+		username: string;
+		name: string;
+		avatarUrl?: string;
+		count: number;
+	};
+
+	const people = $derived.by<Person[]>(() => {
+		const byUsername: Record<string, Person> = {};
+		for (const u of data.updates) {
+			if (!u.authorUsername) continue;
+			const existing = byUsername[u.authorUsername];
+			if (existing) {
+				existing.count += 1;
+			} else {
+				byUsername[u.authorUsername] = {
+					username: u.authorUsername,
+					name: u.authorName ?? u.authorUsername,
+					avatarUrl: u.authorAvatarUrl,
+					count: 1
+				};
+			}
+		}
+		return Object.values(byUsername).sort((a, b) =>
+			a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
+		);
+	});
+
+	let selectedPerson = $state<string | null>(null);
+
+	const filteredUpdates = $derived(
+		selectedPerson === null
+			? data.updates
+			: data.updates.filter((u) => u.authorUsername === selectedPerson)
+	);
+
+	const selectPerson = (username: string | null) => {
+		selectedPerson = selectedPerson === username ? null : username;
+	};
 </script>
 
 <svelte:head>
@@ -68,7 +108,39 @@
 			</section>
 
 			<section class="timeline-section" aria-label="People-first updates">
-				<Timeline updates={data.updates} hasAccounts={data.accounts.length > 0} />
+				<div class="people-filter" role="group" aria-label="Filter by person">
+					<button
+						type="button"
+						class="chip"
+						class:active={selectedPerson === null}
+						onclick={() => selectPerson(null)}
+					>
+						<span class="chip-label">All</span>
+						<span class="chip-count">{data.updates.length}</span>
+					</button>
+					{#each people as person (person.username)}
+						<button
+							type="button"
+							class="chip"
+							class:active={selectedPerson === person.username}
+							onclick={() => selectPerson(person.username)}
+						>
+							{#if person.avatarUrl}
+								<img class="chip-avatar" src={person.avatarUrl} alt="" />
+							{:else}
+								<span class="chip-initials" aria-hidden="true">
+									{person.name.slice(0, 1).toUpperCase()}
+								</span>
+							{/if}
+							<span class="chip-label">{person.name}</span>
+							<span class="chip-count">{person.count}</span>
+						</button>
+					{/each}
+				</div>
+				<p class="filter-results">
+					Showing {filteredUpdates.length} of {data.updates.length} updates
+				</p>
+				<Timeline updates={filteredUpdates} hasAccounts={data.accounts.length > 0} />
 			</section>
 		</main>
 	</div>
@@ -247,6 +319,96 @@
 		.intro-panel {
 			align-items: stretch;
 			flex-direction: column;
+		}
+	}
+
+	.people-filter {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-bottom: 0.6rem;
+		scrollbar-width: thin;
+	}
+
+	.people-filter::-webkit-scrollbar {
+		display: none;
+	}
+
+	.chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		min-height: 40px;
+		padding: 0.4rem 0.85rem;
+		border: 1px solid var(--color-border);
+		border-radius: 999px;
+		background: var(--color-surface-soft);
+		color: var(--color-text);
+		font: inherit;
+		font-size: 0.92rem;
+		cursor: pointer;
+		white-space: nowrap;
+		transition:
+			border-color var(--transition),
+			background var(--transition);
+	}
+
+	.chip:hover {
+		border-color: var(--color-brand-hover);
+	}
+
+	.chip.active {
+		border-color: var(--color-brand);
+		background: rgba(144, 205, 195, 0.18);
+		font-weight: 600;
+	}
+
+	.chip-avatar {
+		width: 24px;
+		height: 24px;
+		object-fit: cover;
+		border-radius: 50%;
+		flex-shrink: 0;
+	}
+
+	.chip-initials {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 24px;
+		height: 24px;
+		border-radius: 50%;
+		background: var(--color-brand);
+		color: #fff;
+		font-size: 0.72rem;
+		font-weight: 700;
+		flex-shrink: 0;
+	}
+
+	.chip-label {
+		line-height: 1;
+	}
+
+	.chip-count {
+		color: var(--color-text-muted);
+		font-size: 0.78rem;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.chip.active .chip-count {
+		color: var(--color-text);
+	}
+
+	.filter-results {
+		margin: 0 0 1.25rem;
+		color: var(--color-text-muted);
+		font-size: 0.82rem;
+	}
+
+	@media (max-width: 560px) {
+		.people-filter {
+			flex-wrap: nowrap;
+			overflow-x: auto;
 		}
 	}
 </style>

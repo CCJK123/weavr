@@ -92,6 +92,27 @@ credentials.
 - [x] Run `pnpm run lint`.
 - [x] Build and deploy with `npx wrangler deploy`.
 
+## Phase 3M+ — Multi-platform mock feed & UI polish
+
+Extends the mock feed beyond X: adds mocked Instagram and Telegram posts in
+the same unified timeline, generated profile pictures and post images, source
+icons per platform, and a person filter.
+
+- [x] Add `instagram` to `Provider` and `instagram_post` to `UpdateSourceKind` in `src/lib/types.ts`.
+- [x] Add `authorAvatarUrl?` and `mediaUrls?` fields to the `Update` type.
+- [x] Rewrite `src/lib/server/mockData.ts` with a unified `mockPosts` array spanning X, Instagram, and Telegram, sharing one username per person across platforms.
+- [x] Generate deterministic DiceBear profile pictures keyed by username.
+- [x] Generate deterministic picsum.photos post images for some posts (Instagram + select X/Telegram).
+- [x] Add platform-appropriate `externalUrl` per post (X status, Instagram /p/, Telegram /t.me/ for channel posts; none for DMs).
+- [x] Create `src/lib/components/SourceIcon.svelte` with X, Instagram, and Telegram brand glyphs.
+- [x] Update `UpdateCard.svelte` to render the author avatar image, the source icon + provider-derived label, and post media (single + grid).
+- [x] Add a people filter bar to `src/routes/+page.svelte` with avatar chips, per-person counts, a toggleable active state, and a “Showing N of M” caption.
+- [x] Pass filtered updates to `<Timeline>`.
+- [x] Run `pnpm run check`.
+- [x] Run `pnpm run lint`.
+- [x] Build and deploy with `npx wrangler deploy`.
+- [x] Verify the deployed Worker returns HTTP 200 and the multi-platform feed renders.
+
 ## Phase 3 — Implement X OAuth and one import attempt
 
 > Deferred in favor of the mock feed (Phase 3M). Real X OAuth routes and provider remain in the codebase but are unlinked from the UI; they require paid X API credits and worker secrets to function.
