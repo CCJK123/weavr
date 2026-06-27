@@ -118,3 +118,8 @@ export function setConnectorNotice(provider: 'x' | 'telegram', notice: string): 
 export function getConnectorNotice(provider: 'x' | 'telegram'): string | undefined {
 	return connectorNotices.get(provider);
 }
+
+/** Remove a connector notice (e.g. once a previously-blocked provider imports cleanly). */
+export function clearConnectorNotice(provider: 'x' | 'telegram'): void {
+	connectorNotices.delete(provider);
+}

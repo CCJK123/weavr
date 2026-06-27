@@ -74,40 +74,40 @@ for now (data is lost when a Worker isolate recycles — demo-only).
 
 ## Phase 3 — Implement X OAuth and one import attempt
 
-- [ ] Create `src/lib/server/providers/x.ts`.
-- [ ] Add X constants for `https://x.com/i/oauth2/authorize`, `https://api.x.com/2/oauth2/token`, `https://api.x.com/2`, and scopes `tweet.read users.read offline.access`.
-- [ ] Add lazy X config readers for `APP_URL`, `X_CLIENT_ID`, `X_CLIENT_SECRET`, and `X_REDIRECT_URI`.
-- [ ] Validate that `X_REDIRECT_URI` equals `${APP_URL}/api/auth/x/callback` in the X config reader.
-- [ ] Add a PKCE verifier generator in `src/lib/server/providers/x.ts` or a small shared server helper.
-- [ ] Add a PKCE `S256` challenge generator in `src/lib/server/providers/x.ts` or a small shared server helper.
-- [ ] Create `src/routes/api/auth/x/start/+server.ts`.
-- [ ] Generate a PKCE verifier in `/api/auth/x/start`.
-- [ ] Generate a PKCE `S256` challenge in `/api/auth/x/start`.
-- [ ] Generate a CSRF `state` in `/api/auth/x/start`.
-- [ ] Store the X OAuth `state` and PKCE verifier in the in-memory store with a 10-minute expiry.
-- [ ] Redirect `/api/auth/x/start` to the X authorization URL with scopes exactly `tweet.read users.read offline.access`.
-- [ ] Wire the X connector action row to `/api/auth/x/start`.
-- [ ] Create `src/routes/api/auth/x/callback/+server.ts`.
-- [ ] Validate the returned X OAuth `state` in `/api/auth/x/callback`.
-- [ ] Exchange the returned X OAuth code at `https://api.x.com/2/oauth2/token`.
-- [ ] Fetch the connected X profile from `/2/users/me` with `user.fields=id,name,username,profile_image_url`.
-- [ ] Store the connected X account and token metadata in the in-memory store after the X provider user ID is known.
-- [ ] Store X token metadata in memory using the `XTokenMetadata` fields.
-- [ ] Update the X connector row with the connected X profile username, display name, and avatar URL when available.
-- [ ] Attempt one recent-post fetch from `/2/users/:id/tweets` with `max_results=5` after successful X connection.
-- [ ] Normalize fetched X posts into `Update` records when X API access allows post import.
-- [ ] Store normalized X updates in the in-memory store.
-- [ ] Set X status to `blocked` for X 403 responses or X endpoint-access errors during recent-post import.
-- [ ] Render “X is connected, but this API tier does not allow post import yet.” when X status is `blocked`.
-- [ ] Set X status to `rate_limited` when X returns a rate-limit response.
-- [ ] Set X status to `needs_reconnect` for invalid or expired token responses.
-- [ ] Set X status to `error` for non-rate-limit, non-token X profile/import failures.
+- [x] Create `src/lib/server/providers/x.ts`.
+- [x] Add X constants for `https://x.com/i/oauth2/authorize`, `https://api.x.com/2/oauth2/token`, `https://api.x.com/2`, and scopes `tweet.read users.read offline.access`.
+- [x] Add lazy X config readers for `APP_URL`, `X_CLIENT_ID`, `X_CLIENT_SECRET`, and `X_REDIRECT_URI`.
+- [x] Validate that `X_REDIRECT_URI` equals `${APP_URL}/api/auth/x/callback` in the X config reader.
+- [x] Add a PKCE verifier generator in `src/lib/server/providers/x.ts` or a small shared server helper.
+- [x] Add a PKCE `S256` challenge generator in `src/lib/server/providers/x.ts` or a small shared server helper.
+- [x] Create `src/routes/api/auth/x/start/+server.ts`.
+- [x] Generate a PKCE verifier in `/api/auth/x/start`.
+- [x] Generate a PKCE `S256` challenge in `/api/auth/x/start`.
+- [x] Generate a CSRF `state` in `/api/auth/x/start`.
+- [x] Store the X OAuth `state` and PKCE verifier in the in-memory store with a 10-minute expiry.
+- [x] Redirect `/api/auth/x/start` to the X authorization URL with scopes exactly `tweet.read users.read offline.access`.
+- [x] Wire the X connector action row to `/api/auth/x/start`.
+- [x] Create `src/routes/api/auth/x/callback/+server.ts`.
+- [x] Validate the returned X OAuth `state` in `/api/auth/x/callback`.
+- [x] Exchange the returned X OAuth code at `https://api.x.com/2/oauth2/token`.
+- [x] Fetch the connected X profile from `/2/users/me` with `user.fields=id,name,username,profile_image_url`.
+- [x] Store the connected X account and token metadata in the in-memory store after the X provider user ID is known.
+- [x] Store X token metadata in memory using the `XTokenMetadata` fields.
+- [x] Update the X connector row with the connected X profile username, display name, and avatar URL when available.
+- [x] Attempt one recent-post fetch from `/2/users/:id/tweets` with `max_results=5` after successful X connection.
+- [x] Normalize fetched X posts into `Update` records when X API access allows post import.
+- [x] Store normalized X updates in the in-memory store.
+- [x] Set X status to `blocked` for X 403 responses or X endpoint-access errors during recent-post import.
+- [x] Render “X is connected, but this API tier does not allow post import yet.” when X status is `blocked`.
+- [x] Set X status to `rate_limited` when X returns a rate-limit response.
+- [x] Set X status to `needs_reconnect` for invalid or expired token responses.
+- [x] Set X status to `error` for non-rate-limit, non-token X profile/import failures.
 - [ ] Start the local app or selected callback test environment before real X OAuth validation.
 - [ ] Verify the X app callback URL matches `${APP_URL}/api/auth/x/callback` before real X OAuth testing.
 - [ ] Verify no fake X imports are created when X API access is unavailable.
 - [ ] Verify X imported posts appear in the same timeline as existing Telegram updates.
-- [ ] Run `pnpm run check`.
-- [ ] Run `pnpm run lint`.
+- [x] Run `pnpm run check`.
+- [x] Run `pnpm run lint`.
 
 ## Phase 4 — Implement Telegram Login identity
 

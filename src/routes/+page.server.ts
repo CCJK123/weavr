@@ -16,7 +16,10 @@ export const load: PageServerLoad = () => {
 		connectors: {
 			x: {
 				status: (xAccount?.status ?? 'idle') as ConnectorStatus,
-				notice: getConnectorNotice('x')
+				notice: getConnectorNotice('x'),
+				username: xAccount?.username,
+				displayName: xAccount?.displayName,
+				avatarUrl: xAccount?.avatarUrl
 			},
 			telegramLogin: {
 				status: (telegramAccount?.status ?? 'idle') as ConnectorStatus,

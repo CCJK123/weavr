@@ -8,7 +8,10 @@
 		status,
 		href,
 		actionLabel,
-		notice
+		notice,
+		username,
+		displayName,
+		avatarUrl
 	}: {
 		title: string;
 		description: string;
@@ -16,6 +19,9 @@
 		href?: string;
 		actionLabel?: string;
 		notice?: string;
+		username?: string;
+		displayName?: string;
+		avatarUrl?: string;
 	} = $props();
 
 	const statusLabels: Record<ConnectorStatus, string> = {
@@ -32,7 +38,14 @@
 		href !== undefined && actionLabel !== undefined && status !== 'connected'
 	);
 
-	const resolvedHref = $derived(href !== undefined ? resolve(href) : undefined);
+	const showIdentity = $derived(username !== undefined || displayName !== undefined);
+
+	// `href` is a dynamic prop. `resolve()` is typed over known route literals,
+	// so cast to its parameter type; this app uses the default base path, so the
+	// resolved value equals the input href.
+	const resolvedHref = $derived(
+		href !== undefined ? resolve(href as Parameters<typeof resolve>[0]) : undefined
+	);
 </script>
 
 <div class="connector-panel" data-status={status}>
@@ -43,6 +56,17 @@
 	<p class="description">{description}</p>
 	{#if notice}
 		<p class="notice">{notice}</p>
+	{/if}
+	{#if showIdentity}
+		<div class="identity">
+			{#if avatarUrl}
+				<img class="avatar" src={avatarUrl} alt="" width="32" height="32" />
+			{/if}
+			<div class="identity-text">
+				{#if displayName}<span class="display-name">{displayName}</span>{/if}
+				{#if username}<span class="username">@{username}</span>{/if}
+			</div>
+		</div>
 	{/if}
 	{#if showAction && resolvedHref}
 		<a class="action-button" href={resolvedHref}>{actionLabel}</a>
@@ -111,6 +135,38 @@
 		color: var(--color-text-muted);
 		font-size: 0.85rem;
 		font-style: italic;
+	}
+
+	.identity {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		margin-top: 0.25rem;
+	}
+
+	.avatar {
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+		object-fit: cover;
+		border: 1px solid var(--color-border);
+	}
+
+	.identity-text {
+		display: flex;
+		flex-direction: column;
+		line-height: 1.2;
+	}
+
+	.display-name {
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: var(--color-text);
+	}
+
+	.username {
+		font-size: 0.8rem;
+		color: var(--color-text-muted);
 	}
 
 	.action-button {

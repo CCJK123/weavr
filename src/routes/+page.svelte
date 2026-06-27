@@ -26,6 +26,9 @@
 				href="/api/auth/x/start"
 				actionLabel="Connect X"
 				notice={data.connectors.x.notice}
+				username={data.connectors.x.username}
+				displayName={data.connectors.x.displayName}
+				avatarUrl={data.connectors.x.avatarUrl}
 			/>
 			<ConnectorPanel
 				title="Telegram Login"

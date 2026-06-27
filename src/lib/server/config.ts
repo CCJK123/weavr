@@ -19,3 +19,14 @@ export function getRequiredServerEnv(name: string): string {
 	}
 	return value;
 }
+
+/**
+ * Read an optional server-side environment variable. Returns `undefined` when
+ * the value is missing or empty, so callers can branch on optional credentials
+ * (e.g. a public OAuth client with no secret).
+ */
+export function getOptionalServerEnv(name: string): string | undefined {
+	const value = (env as Record<string, string | undefined>)[name];
+	if (value === undefined || value === '') return undefined;
+	return value;
+}
