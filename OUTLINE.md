@@ -31,7 +31,7 @@ Official references used:
 - Use Telegram Login/OIDC for identity with scopes `openid profile`.
 - Use Telegram Bot API ingestion for sent/forwarded bot messages, and handle channel posts only when bot/channel setup is available.
 - Keep ingestion text/caption-first for the MVP.
-- Do not build media storage, GitHub, Instagram, WhatsApp, multi-user auth, D1, KV, R2, migrations, repository layers, or database abstractions in the first local pass.
+  Do not build media storage, GitHub, Instagram, WhatsApp, multi-user auth, D1, KV, R2, migrations, repository layers, or database abstractions in the first Workers pass; the in-memory store is acceptable for the demo.
 - Show Instagram and WhatsApp only as static limitation notes, not connector actions.
 - Do not claim access to Instagram media without Meta setup/review.
 - Do not claim access to WhatsApp Status or friends’ WhatsApp updates.
@@ -39,9 +39,9 @@ Official references used:
 - Do not fake live provider data.
 - If X API access blocks post import, show the blocked state explicitly.
 - If Telegram channel setup is unavailable, show the setup requirement explicitly.
-- Run the first implementation locally with an in-memory server store; local MVP data may disappear when the dev server restarts.
-- Treat `wrangler deploy --temporary` as a UI smoke-test tool only.
-- Use a stable HTTPS URL for real X callbacks and Telegram webhooks, either through a claimed/stable deployment or a user-authorized local tunnel.
+- Run the first implementation on Cloudflare Workers with an in-memory server store; in-memory data is lost when a Worker isolate recycles, so this is demo-only until durable storage is added.
+- Use `wrangler deploy --temporary` to get an ephemeral deployment URL plus a claim URL; claim it to a Cloudflare account to promote it to a stable deployment. Unclaimed temporary deploys expire in 60 minutes and are for UI smoke tests only.
+- Use a claimed Cloudflare Workers deployment as the stable HTTPS URL for real X callbacks and Telegram webhooks. The local-only / local-tunnel approach is vetoed for this MVP.
 - Do not install packages or configure paid/external services without user authorization.
 - Read provider credentials only in routes/features that require them; the profile page should render without provider credentials.
 - Store tokens only in server-side memory for this local MVP. Token storage must be encrypted or abstracted behind server-only durable storage before public launch.

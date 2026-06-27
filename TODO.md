@@ -64,9 +64,13 @@ Action checklist for implementing the MVP. Product scope, limitations, and guard
 
 ## Phase 2 — Prepare provider callback testing
 
-- [ ] Decide with the user whether real provider testing will use `local_tunnel` or `claimed_cloudflare` mode.
-- [ ] Record the selected provider test mode in `README.md`.
-- [ ] Configure `APP_URL` to match the selected test mode.
+Provider test mode decided: `claimed_cloudflare`. The local-only / local-tunnel
+approach is vetoed; the app runs on Cloudflare Workers with an in-memory store
+for now (data is lost when a Worker isolate recycles — demo-only).
+
+- [x] Decide provider test mode: `claimed_cloudflare`.
+- [x] Record the selected provider test mode in `README.md`.
+- [x] Document `APP_URL` configuration against the claimed deployment URL in `README.md` (set the literal value once the temporary deploy is claimed).
 
 ## Phase 3 — Implement X OAuth and one import attempt
 
